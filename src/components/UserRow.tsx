@@ -37,7 +37,7 @@ export const UserRow: React.FC<UserRowProps> = React.memo(({ user, style, onEdit
         {user.role}
       </div>
       <div className="hidden lg:block w-20 px-2 text-sm text-gray-400 text-right">
-        {user.age} yrs
+        {user.age} age
       </div>
       <div className="hidden xl:block w-32 px-2 text-xs text-gray-500 text-right">
         {computedValue}
