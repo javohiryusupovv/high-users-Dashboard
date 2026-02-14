@@ -48,8 +48,7 @@ export function LoadingState() {
           style={{ animation: "spin 1s linear infinite" }}
         />
       </div>
-      <p className="text-slate-400 text-sm">Generating 10,000 users...</p>
-      <p className="text-slate-600 text-xs mt-1">Preparing virtualized dataset</p>
+      <p className="text-slate-400 text-sm">Loading...</p>
     </div>
   );
 }

@@ -20,8 +20,6 @@ export function useDataFetcher(count: number): DataFetcherReturn {
   useEffect(() => {
     setIsLoading(true);
     setError(null);
-
-    // Simulate async data fetch
     const timer = setTimeout(() => {
       try {
         const data = generateUsers(count);

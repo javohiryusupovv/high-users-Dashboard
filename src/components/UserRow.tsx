@@ -1,118 +1,46 @@
 
-import { memo } from "react";
-import type { User } from "../types";
-import { getCachedRiskScore } from "../utils/computeRiskScore";
+import React, { useMemo } from 'react';
+import type { User } from '../context/UserContext';
+import { expensiveComputation } from '../utils/expensiveComputation';
 
 interface UserRowProps {
   user: User;
   style: React.CSSProperties;
-  onClick: (user: User) => void;
-  isEditing: boolean;
+  onEdit: (user: User) => void;
 }
 
-export const UserRow = memo(function UserRow({
-  user,
-  style,
-  onClick,
-  isEditing,
-}: UserRowProps) {
-  const risk = getCachedRiskScore(user);
+export const UserRow: React.FC<UserRowProps> = React.memo(({ user, style, onEdit }) => {
+  // Expensive computation simulation
+  const computedValue = useMemo(() => expensiveComputation(user.name + user.email), [user.name, user.email]);
 
   return (
     <div
       style={style}
-      onClick={() => onClick(user)}
-      className={`flex items-center px-4 border-b border-slate-800/50 cursor-pointer transition-colors duration-150 ${
-        isEditing
-          ? "bg-violet-500/10 border-violet-500/30"
-          : "hover:bg-slate-800/40"
-      }`}
+      className="flex items-center p-4 border-b border-gray-700 hover:bg-gray-700/50 cursor-pointer transition-colors"
+      onClick={() => onEdit(user)}
     >
-      {/* Status dot */}
-      <div className="w-[4%] min-w-[40px]">
-        <div
-          className={`w-2 h-2 rounded-full ${
-            user.isActive ? "bg-emerald-400" : "bg-slate-600"
-          }`}
-        />
+      <div className="w-10 h-10 rounded-full overflow-hidden mr-4 bg-gray-700 shrink-0">
+        <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" loading="lazy" />
       </div>
-
-      {/* Name + Avatar */}
-      <div className="w-[18%] min-w-[150px] flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
-          {user.firstName[0]}
-          {user.lastName[0]}
-        </div>
-        <div className="truncate">
-          <div className="text-sm font-medium text-slate-100 truncate">
-            {user.firstName} {user.lastName}
-          </div>
-          <div className="text-xs text-slate-500 truncate">{user.id}</div>
-        </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-gray-100 truncate">{user.name}</p>
+        <p className="text-sm text-gray-500 truncate">{user.email}</p>
       </div>
-
-      {/* Email */}
-      <div className="w-[20%] min-w-[180px] text-sm text-slate-300 truncate pr-4">
-        {user.email}
-      </div>
-
-      {/* Age */}
-      <div className="w-[6%] min-w-[50px] text-sm text-slate-300 text-center">
-        {user.age}
-      </div>
-
-      {/* Department */}
-      <div className="w-[12%] min-w-[100px]">
-        <span className="text-xs px-2 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700/50">
-          {user.department}
+      <div className="hidden md:block w-32 px-2">
+        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'active' ? 'bg-green-900 text-green-200' :
+            user.status === 'inactive' ? 'bg-red-900 text-red-200' : 'bg-yellow-900 text-yellow-200'
+          }`}>
+          {user.status}
         </span>
       </div>
-
-      {/* Salary */}
-      <div className="w-[10%] min-w-[90px] text-sm text-slate-200 font-mono">
-        ${user.salary.toLocaleString()}
+      <div className="hidden md:block w-24 px-2 text-sm text-gray-400">
+        {user.role}
       </div>
-
-      {/* Join Date */}
-      <div className="w-[10%] min-w-[80px] text-sm text-slate-400">
-        {user.joinDate}
+      <div className="hidden lg:block w-20 px-2 text-sm text-gray-400 text-right">
+        {user.age} yrs
       </div>
-
-      {/* Performance */}
-      <div className="w-[8%] min-w-[60px]">
-        <div className="flex items-center gap-1.5">
-          <div className="w-12 h-1.5 bg-slate-800 rounded-full overflow-hidden">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-violet-500 to-indigo-400"
-              style={{ width: `${user.performanceScore}%` }}
-            />
-          </div>
-          <span className="text-xs text-slate-400 font-mono">
-            {user.performanceScore}
-          </span>
-        </div>
-      </div>
-
-      {/* Risk Score (heavy computation, cached) */}
-      <div className="w-[12%] min-w-[100px]">
-        <div className="flex items-center gap-2">
-          <span className={`text-sm font-mono font-semibold ${risk.color}`}>
-            {risk.score}
-          </span>
-          <span
-            className={`text-xs px-1.5 py-0.5 rounded ${
-              risk.label === "Low"
-                ? "bg-emerald-500/10 text-emerald-400"
-                : risk.label === "Medium"
-                  ? "bg-amber-500/10 text-amber-400"
-                  : risk.label === "High"
-                    ? "bg-orange-500/10 text-orange-400"
-                    : "bg-red-500/10 text-red-400"
-            }`}
-          >
-            {risk.label}
-          </span>
-        </div>
+      <div className="hidden xl:block w-32 px-2 text-xs text-gray-500 text-right">
+        {computedValue}
       </div>
     </div>
   );

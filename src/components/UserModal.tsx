@@ -1,216 +1,151 @@
 
-
-import { useState, useEffect, useCallback } from "react";
-import type { User } from "../types";
-import { getCachedRiskScore } from "../utils/computeRiskScore";
-import { DEPARTMENTS } from "../utils/generateUsers";
+import React, { useState, useEffect } from 'react';
+import type { User } from '../context/UserContext';
 
 interface UserModalProps {
   user: User;
+  isOpen: boolean;
   onClose: () => void;
-  onSave: (userId: string, updates: Partial<User>) => void;
+  onSave: (user: User) => void;
 }
 
-export function UserModal({ user, onClose, onSave }: UserModalProps) {
-  const [editMode, setEditMode] = useState(false);
-  const [form, setForm] = useState({
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    department: user.department,
-    salary: user.salary,
-    isActive: user.isActive,
-  });
-  const [saving, setSaving] = useState(false);
-  const risk = getCachedRiskScore(user);
+export const UserModal: React.FC<UserModalProps> = ({ user, isOpen, onClose, onSave }) => {
+  const [formData, setFormData] = useState<User>(user);
 
-  // Sync form when user prop changes (e.g., after rollback)
   useEffect(() => {
-    setForm({
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      department: user.department,
-      salary: user.salary,
-      isActive: user.isActive,
-    });
+    setFormData(user);
   }, [user]);
 
-  const handleSave = useCallback(() => {
-    setSaving(true);
-    onSave(user.id, form);
-    setSaving(false);
-    setEditMode(false);
-  }, [user.id, form, onSave]);
+  if (!isOpen) return null;
 
-  const handleChange = useCallback(
-    (field: string, value: string | number | boolean) => {
-      setForm((prev) => ({ ...prev, [field]: value }));
-    },
-    []
-  );
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'age' ? parseInt(value) || 0 : value
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(formData);
+    onClose();
+  };
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-      <div
-        className="relative bg-slate-900 border border-slate-700/50 rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-start justify-between p-6 border-b border-slate-800">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-lg font-bold text-white">
-              {user.firstName[0]}
-              {user.lastName[0]}
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-white">
-                {user.firstName} {user.lastName}
-              </h2>
-              <p className="text-sm text-slate-400">
-                {user.id} · {user.department}
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-slate-500 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
-          >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M15 5L5 15M5 5l10 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
+    <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/40 overflow-y-auto">
+      <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-md mx-4 animate-fade-in-up border border-gray-700">
+        <div className="flex justify-between items-center p-6 border-b border-gray-700">
+          <h3 className="text-xl font-semibold text-white">Edit User</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-300 focus:outline-none">
+            <span className="text-2xl">&times;</span>
           </button>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 p-6 border-b border-slate-800">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-violet-400">{user.performanceScore}</div>
-            <div className="text-xs text-slate-500 mt-1">Performance</div>
-          </div>
-          <div className="text-center">
-            <div className={`text-2xl font-bold ${risk.color}`}>{risk.score}</div>
-            <div className="text-xs text-slate-500 mt-1">Risk Score</div>
-          </div>
-          <div className="text-center">
-            <div className={`text-2xl font-bold ${user.isActive ? "text-emerald-400" : "text-slate-500"}`}>
-              {user.isActive ? "Active" : "Inactive"}
-            </div>
-            <div className="text-xs text-slate-500 mt-1">Status</div>
-          </div>
-        </div>
-
-        {/* Body */}
-        <div className="p-6 space-y-4">
-          {!editMode ? (
-            <>
-              <InfoRow label="Email" value={user.email} />
-              <InfoRow label="Phone" value={user.phone} />
-              <InfoRow label="Location" value={`${user.city}, ${user.country}`} />
-              <InfoRow label="Salary" value={`$${user.salary.toLocaleString()}`} />
-              <InfoRow label="Join Date" value={user.joinDate} />
-              <InfoRow label="Age" value={String(user.age)} />
-              <button
-                onClick={() => setEditMode(true)}
-                className="w-full mt-4 py-2.5 px-4 bg-violet-600 hover:bg-violet-500 text-white font-medium rounded-xl transition-colors"
-              >
-                Edit User
-              </button>
-            </>
-          ) : (
-            <>
-              <EditField label="First Name" value={form.firstName} onChange={(v) => handleChange("firstName", v)} />
-              <EditField label="Last Name" value={form.lastName} onChange={(v) => handleChange("lastName", v)} />
-              <EditField label="Email" value={form.email} onChange={(v) => handleChange("email", v)} />
-              <div>
-                <label className="block text-xs text-slate-500 mb-1.5">Department</label>
-                <select
-                  value={form.department}
-                  onChange={(e) => handleChange("department", e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-violet-500 focus:outline-none"
-                >
-                  {DEPARTMENTS.map((d) => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
-                </select>
-              </div>
-              <EditField
-                label="Salary"
-                value={String(form.salary)}
-                onChange={(v) => handleChange("salary", Number(v))}
-                type="number"
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-300">First Name</label>
+              <input
+                type="text"
+                name="firstName"
+                value={formData.firstName}
+                onChange={(e) => {
+                  const firstName = e.target.value;
+                  setFormData(prev => ({ ...prev, firstName, name: `${firstName} ${prev.lastName}` }));
+                }}
+                className="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border outline-none"
+                required
               />
-              <div className="flex items-center gap-3">
-                <label className="text-xs text-slate-500">Active Status</label>
-                <button
-                  onClick={() => handleChange("isActive", !form.isActive)}
-                  className={`relative w-10 h-5 rounded-full transition-colors ${
-                    form.isActive ? "bg-emerald-500" : "bg-slate-600"
-                  }`}
-                >
-                  <div
-                    className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
-                      form.isActive ? "left-5" : "left-0.5"
-                    }`}
-                  />
-                </button>
-              </div>
-              <div className="flex gap-3 mt-4">
-                <button
-                  onClick={() => setEditMode(false)}
-                  className="flex-1 py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-xl transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className="flex-1 py-2.5 px-4 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white font-medium rounded-xl transition-colors"
-                >
-                  {saving ? "Saving..." : "Save Changes"}
-                </button>
-              </div>
-              <p className="text-xs text-slate-600 text-center mt-2">
-                Optimistic update: changes appear instantly. ~30% simulated failure rate with rollback.
-              </p>
-            </>
-          )}
-        </div>
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-300">Last Name</label>
+              <input
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={(e) => {
+                  const lastName = e.target.value;
+                  setFormData(prev => ({ ...prev, lastName, name: `${prev.firstName} ${lastName}` }));
+                }}
+                className="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border outline-none"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border outline-none"
+              required
+            />
+          </div>
+
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-300">Role</label>
+              <select
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border outline-none"
+              >
+                <option value="Admin">Admin</option>
+                <option value="User">User</option>
+                <option value="Moderator">Moderator</option>
+                <option value="Guest">Guest</option>
+              </select>
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-300">Status</label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value as User['status'] })}
+                className="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border outline-none"
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="pending">Pending</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300">Age</label>
+            <input
+              type="number"
+              name="age"
+              value={formData.age}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border outline-none"
+              required
+              min="0"
+            />
+          </div>
+
+          <div className="mt-6 flex justify-end space-x-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 border border-gray-600 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Save Changes
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
-}
-
-function InfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between items-center py-2 border-b border-slate-800/50">
-      <span className="text-sm text-slate-500">{label}</span>
-      <span className="text-sm text-slate-200">{value}</span>
-    </div>
-  );
-}
-
-function EditField({
-  label,
-  value,
-  onChange,
-  type = "text",
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  type?: string;
-}) {
-  return (
-    <div>
-      <label className="block text-xs text-slate-500 mb-1.5">{label}</label>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-violet-500 focus:outline-none"
-      />
-    </div>
-  );
-}
+};
