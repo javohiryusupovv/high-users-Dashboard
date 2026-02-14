@@ -4,6 +4,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { useUsers } from '../context/UserContext';
 import type { User } from '../context/UserContext';
 import { UserRow } from './UserRow';
+import { ArrowDownZA, ArrowDownAZ, ArrowDown01, ArrowDown10, ArrowUpDown } from 'lucide-react';
 
 interface VirtualTableProps {
     onEdit: (user: User) => void;
@@ -32,9 +33,16 @@ export const VirtualTable: React.FC<VirtualTableProps> = ({ onEdit }) => {
 
     const getSortIcon = (key: keyof User) => {
         if (sorting?.key !== key) {
-            return <span className="text-gray-600  ml-1">▼</span>;
+            return <span className="text-gray-600  ml-2.5"><ArrowUpDown className='w-4 h-4' /></span>;
         }
-        return <span className="text-blue-400 ml-1">{sorting.order === 'asc' ? '▲' : '▼'}</span>;
+
+        const isAsc = sorting.order === 'asc';
+
+        if (key === 'age' || key === 'salary' || key === 'performanceScore') {
+            return <span className="text-blue-400 ml-2.5">{isAsc ? <ArrowDown01 className='w-4 h-4' /> : <ArrowDown10 className='w-4 h-4' />}</span>;
+        }
+
+        return <span className="text-blue-400 ml-2.5">{isAsc ? <ArrowDownAZ className='w-4 h-4' /> : <ArrowDownZA className='w-4 h-4' />}</span>;
     };
 
     return (
