@@ -26,13 +26,17 @@ A high-performance React application designed to handle and display large datase
     ```bash
     npm install
     ```
+2.  **Install Icons library**
+    ```bash
+    npm install lucide-react
+    ```
 
-2.  **Run Development Server**
+3.  **Run Development Server**
     ```bash
     npm run dev
     ```
 
-3.  **Build for Production**
+4.  **Build for Production**
     ```bash
     npm run build
     ```
