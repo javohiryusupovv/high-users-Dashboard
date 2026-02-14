@@ -22,12 +22,12 @@ const DashboardContent = () => {
     setSelectedUser(null);
   };
 
+  //succes update users
+
   const handleSave = async (updatedUser: User) => {
     try {
       await updateUser(updatedUser);
-      // Optional: Show success toast
     } catch (error) {
-      // Optional: Show error toast (handled by console error in context for now)
       alert("Failed to update user due to simulated error. Rolling back.");
     }
   };
