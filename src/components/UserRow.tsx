@@ -1,7 +1,6 @@
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import type { User } from '../context/UserContext';
-import { expensiveComputation } from '../utils/expensiveComputation';
 
 interface UserRowProps {
   user: User;
@@ -10,8 +9,7 @@ interface UserRowProps {
 }
 
 export const UserRow: React.FC<UserRowProps> = React.memo(({ user, style, onEdit }) => {
-  // Expensive computation simulation
-  const computedValue = useMemo(() => expensiveComputation(user.name + user.email), [user.name, user.email]);
+  // Expensive computation removed as file was deleted
 
   return (
     <div
@@ -28,7 +26,7 @@ export const UserRow: React.FC<UserRowProps> = React.memo(({ user, style, onEdit
       </div>
       <div className="hidden md:block w-32 px-2">
         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'active' ? 'bg-green-900 text-green-200' :
-            user.status === 'inactive' ? 'bg-red-900 text-red-200' : 'bg-yellow-900 text-yellow-200'
+          user.status === 'inactive' ? 'bg-red-900 text-red-200' : 'bg-yellow-900 text-yellow-200'
           }`}>
           {user.status}
         </span>
@@ -40,7 +38,7 @@ export const UserRow: React.FC<UserRowProps> = React.memo(({ user, style, onEdit
         {user.age} age
       </div>
       <div className="hidden xl:block w-32 px-2 text-xs text-gray-500 text-right">
-        {computedValue}
+        -
       </div>
     </div>
   );

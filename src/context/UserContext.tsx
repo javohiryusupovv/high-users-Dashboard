@@ -3,17 +3,8 @@ import React, { createContext, useReducer, useEffect, useCallback, useContext } 
 import type { ReactNode } from 'react';
 
 // --- Types ---
-export interface User {
-    id: string;
-    firstName: string;
-    lastName: string;
-    name: string; // Computed for display/sorting
-    email: string;
-    role: string;
-    status: 'active' | 'inactive' | 'pending';
-    age: number;
-    avatar: string;
-}
+import type { User } from '../types';
+export type { User };
 
 interface UserState {
     users: User[];
@@ -170,7 +161,13 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     role: Math.random() > 0.8 ? 'Admin' : Math.random() > 0.6 ? 'Moderator' : 'User',
                     status: Math.random() > 0.8 ? 'inactive' : Math.random() > 0.9 ? 'pending' : 'active',
                     age: Math.floor(Math.random() * (60 - 18 + 1)) + 18,
-                    avatar: `https://ui-avatars.com/api/?name=${item.first_name}+${item.last_name}&background=random`
+                    avatar: `https://ui-avatars.com/api/?name=${item.first_name}+${item.last_name}&background=random`,
+                    // Extended fields
+                    salary: Math.floor(Math.random() * 100000) + 50000,
+                    performanceScore: Math.floor(Math.random() * 100),
+                    joinDate: new Date(Date.now() - Math.floor(Math.random() * 10000000000)).toISOString(),
+                    department: ['Engineering', 'Sales', 'Marketing', 'HR'][Math.floor(Math.random() * 4)],
+                    isActive: true // defaulted, will rely on status for logic
                 }));
 
                 dispatch({ type: 'FETCH_SUCCESS', payload: mappedData });

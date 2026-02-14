@@ -1,73 +1,56 @@
-# React + TypeScript + Vite
+# User Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A high-performance React application designed to handle and display large datasets (10,000+ users) with optimal performance. This project features a virtualized data table, advanced filtering and sorting, and a modern, dark-themed UI.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **High-Volume Data Handling**: efficiently renders 10,000+ rows using `@tanstack/react-virtual` for windowing/virtualization.
+- **Advanced State Management**: Custom `UserContext` with `useReducer` for predictable state updates and side effects.
+- **Search & Filtering**: Real-time search by name/email with debouncing and role-based filtering.
+- **Sorting**: Multi-column sorting (Name, Status, Role, Age) with visual indicators.
+- **Modern Dark UI**: Fully responsive, dark-themed interface built with Tailwind CSS, featuring backdrop blur modals and smooth transitions.
+- **Optimistic Updates**: Immediate UI feedback for user actions with automatic rollback on (simulated) API failures.
+- **Type Safety**: comprehensive TypeScript definitions for robust development.
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+- **Framework**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
+- **Virtualization**: [@tanstack/react-virtual](https://tanstack.com/virtual/v3)
+- **Linting**: ESLint
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1.  **Install Dependencies**
+    ```bash
+    npm install
+    ```
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+2.  **Run Development Server**
+    ```bash
+    npm run dev
+    ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+3.  **Build for Production**
+    ```bash
+    npm run build
+    ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Project Structure
+
+```
+src/
+├── components/       # UI Components (VirtualTable, UserModal, etc.)
+├── context/          # Global State (UserContext)
+├── hooks/            # Custom Hooks
+├── types/            # TypeScript Interfaces
+└── utils/            # Helper functions
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Key Components
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **VirtualTable**: The core component that handles the virtualized list rendering.
+- **UserModal**: a reusable modal for viewing and editing details with optimistic update logic.
+- **FilterBar**: Contains search input and filter dropdowns.
+- **UserProvider**: Wraps the application to provide global access to user data and actions.

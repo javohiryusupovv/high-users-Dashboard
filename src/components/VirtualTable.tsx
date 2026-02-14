@@ -31,24 +31,26 @@ export const VirtualTable: React.FC<VirtualTableProps> = ({ onEdit }) => {
     };
 
     const getSortIcon = (key: keyof User) => {
-        if (sorting?.key !== key) return null;
-        return sorting.order === 'asc' ? '▲' : '▼';
+        if (sorting?.key !== key) {
+            return <span className="text-gray-600  ml-1">▼</span>;
+        }
+        return <span className="text-blue-400 ml-1">{sorting.order === 'asc' ? '▲' : '▼'}</span>;
     };
 
     return (
         <div className="flex flex-col border border-gray-700 rounded-lg overflow-hidden bg-gray-800 shadow-sm">
             {/* Header */}
             <div className="flex bg-gray-900 font-semibold text-gray-300 border-b border-gray-700">
-                <div className="p-4 flex-1 cursor-pointer hover:bg-gray-800 transition-colors" onClick={() => handleSort('name')}>
+                <div className="p-4 flex-1 cursor-pointer hover:bg-gray-800 transition-colors flex items-center" onClick={() => handleSort('name')}>
                     Name {getSortIcon('name')}
                 </div>
-                <div className="p-4 hidden md:block w-32 cursor-pointer hover:bg-gray-800 transition-colors" onClick={() => handleSort('status')}>
+                <div className="p-4 hidden md:flex w-32 cursor-pointer hover:bg-gray-800 transition-colors items-center" onClick={() => handleSort('status')}>
                     Status {getSortIcon('status')}
                 </div>
-                <div className="p-4 hidden md:block w-24 cursor-pointer hover:bg-gray-800 transition-colors" onClick={() => handleSort('role')}>
+                <div className="p-4 hidden md:flex w-24 cursor-pointer hover:bg-gray-800 transition-colors items-center" onClick={() => handleSort('role')}>
                     Role {getSortIcon('role')}
                 </div>
-                <div className="p-4 hidden lg:block w-20 text-right cursor-pointer hover:bg-gray-800 transition-colors" onClick={() => handleSort('age')}>
+                <div className="p-4 hidden lg:flex w-20 justify-end cursor-pointer hover:bg-gray-800 transition-colors items-center" onClick={() => handleSort('age')}>
                     Age {getSortIcon('age')}
                 </div>
                 <div className="p-4 hidden xl:block w-32 text-right">

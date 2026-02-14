@@ -5,16 +5,18 @@ export interface User {
   id: string;
   firstName: string;
   lastName: string;
+  name: string; // Computed
   email: string;
+  role: string;
+  status: 'active' | 'inactive' | 'pending';
   age: number;
-  department: string;
+  avatar: string;
+  // Extended fields for computeRiskScore
   salary: number;
-  joinDate: string;
-  isActive: boolean;
-  phone: string;
-  city: string;
-  country: string;
   performanceScore: number;
+  joinDate: string;
+  department: string; // Optional or generated
+  isActive: boolean; // Computed or alias for status === 'active'
 }
 
 export type SortField =
